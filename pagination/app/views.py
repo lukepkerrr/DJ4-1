@@ -3,6 +3,7 @@ import csv
 from django.shortcuts import render_to_response, redirect
 from django.urls import reverse
 from django.conf import settings
+from django.core.paginator import Paginator
 
 
 def index(request):
@@ -16,32 +17,25 @@ def bus_stations(request):
     else:
         num_of_page = int(num_of_page)
 
-    if num_of_page == 1:
-        prev_num = None
-    else:
-        prev_num = 'bus_stations?page={}'.format(num_of_page - 1)
-    next_num = 'bus_stations?page={}'.format(num_of_page + 1)
-
-    list_for_response = []
+    final_file = []
     with open(settings.BUS_STATION_CSV) as csvfile:
-        amount_for_skip = num_of_page * 10
-        counter_for_skip = 0
-        counter_for_print = 0
         reader = csv.DictReader(csvfile)
         for row in reader:
-            if amount_for_skip != counter_for_skip:
-                counter_for_skip += 1
-            elif amount_for_skip == counter_for_skip:
-                if counter_for_print != 10:
-                    counter_for_print += 1
-                    list_for_response.append({
+            final_file.append({
                         'Name': row['Name'],
                         'Street': row['Street'],
                         'District': row['District']
                     })
 
+    paginator = Paginator(final_file, 10)
+    prev_num = None
+    next_num = None
+    if paginator.page(num_of_page).has_previous():
+        prev_num = 'bus_stations?page={}'.format(paginator.page(num_of_page).previous_page_number())
+    if paginator.page(num_of_page).has_next():
+        next_num = 'bus_stations?page={}'.format(paginator.page(num_of_page).next_page_number())
     return render_to_response('index.html', context={
-        'bus_stations': list_for_response,
+        'bus_stations': paginator.page(num_of_page),
         'current_page': num_of_page,
         'prev_page_url': prev_num,
         'next_page_url': next_num,
