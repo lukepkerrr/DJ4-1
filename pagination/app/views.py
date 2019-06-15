@@ -18,7 +18,7 @@ def bus_stations(request):
         num_of_page = int(num_of_page)
 
     final_file = []
-    with open(settings.BUS_STATION_CSV) as csvfile:
+    with open(settings.BUS_STATION_CSV, encoding='cp1251') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             final_file.append({

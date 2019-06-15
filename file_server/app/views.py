@@ -9,7 +9,7 @@ def file_list(request, date=''):
     template_name = 'index.html'
     files = []
     for serv_file in os.listdir(settings.FILES_PATH):
-        file_info = os.stat('{}\{}'.format(settings.FILES_PATH, serv_file))
+        file_info = os.stat(os.path.join(settings.FILES_PATH, serv_file))
         ctime = dt.datetime.fromtimestamp(file_info.st_ctime)
         mtime = dt.datetime.fromtimestamp(file_info.st_mtime)
         files.append({
@@ -37,7 +37,7 @@ def file_list(request, date=''):
 
 def file_content(request, name):
     try:
-        with open('{}\{}'.format(settings.FILES_PATH, name)) as opened_file:
+        with open(os.path.join(settings.FILES_PATH, name)) as opened_file:
         # Реализуйте алгоритм подготавливающий контекстные данные для шаблона по примеру:
             return render(
                 request,
